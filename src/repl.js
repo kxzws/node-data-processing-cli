@@ -1,9 +1,13 @@
+import path from "node:path";
 import { createInterface } from "node:readline";
 import { exit, stdin, stdout } from "node:process";
 
 import { ls, up, cd } from "./navigation.js";
 
-import { getCommandAndArgs } from "./utils/argParser.js";
+import { csvToJson } from "./commands/csvToJson.js";
+import { jsonToCsv } from "./commands/jsonToCsv.js";
+
+import { getCommandAndArgs, getArgByName } from "./utils/argParser.js";
 import { appState } from "./utils/pathResolver.js";
 
 const handleSuccessAndErrors = async (callback) => {
@@ -59,6 +63,38 @@ export const startRepl = async () => {
           console.log("Thank you for using Data Processing CLI!");
 
           exit(0);
+        }
+
+        case command === "csv-to-json" && args.length === 4: {
+          await handleSuccessAndErrors(async () => {
+            const inputPath = getArgByName(args, "--input");
+            const outputPath = getArgByName(args, "--output");
+
+            if (!inputPath || !outputPath) throw Error("Invalid argument");
+
+            await csvToJson(
+              path.resolve(appState.cwd, inputPath),
+              path.resolve(appState.cwd, outputPath),
+            );
+          });
+
+          break;
+        }
+
+        case command === "json-to-csv" && args.length === 4: {
+          await handleSuccessAndErrors(async () => {
+            const inputPath = getArgByName(args, "--input");
+            const outputPath = getArgByName(args, "--output");
+
+            if (!inputPath || !outputPath) throw Error("Invalid argument");
+
+            await jsonToCsv(
+              path.resolve(appState.cwd, inputPath),
+              path.resolve(appState.cwd, outputPath),
+            );
+          });
+
+          break;
         }
 
         default:
