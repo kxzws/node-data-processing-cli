@@ -9,6 +9,8 @@ import { jsonToCsv } from "./commands/jsonToCsv.js";
 import { count } from "./commands/count.js";
 import { hash } from "./commands/hash.js";
 import { hashCompare } from "./commands/hashCompare.js";
+import { encrypt } from "./commands/encrypt.js";
+import { decrypt } from "./commands/decrypt.js";
 
 import {
   getCommandAndArgs,
@@ -77,7 +79,7 @@ export const startRepl = async () => {
             const inputPath = getArgByName(args, "--input");
             const outputPath = getArgByName(args, "--output");
 
-            if (!inputPath || !outputPath) throw Error("Invalid argument");
+            if (!inputPath || !outputPath) throw new Error("Invalid argument");
 
             await csvToJson(
               path.resolve(appState.cwd, inputPath),
@@ -93,7 +95,7 @@ export const startRepl = async () => {
             const inputPath = getArgByName(args, "--input");
             const outputPath = getArgByName(args, "--output");
 
-            if (!inputPath || !outputPath) throw Error("Invalid argument");
+            if (!inputPath || !outputPath) throw new Error("Invalid argument");
 
             await jsonToCsv(
               path.resolve(appState.cwd, inputPath),
@@ -108,7 +110,7 @@ export const startRepl = async () => {
           await handleSuccessAndErrors(async () => {
             const inputPath = getArgByName(args, "--input");
 
-            if (!inputPath) throw Error("Invalid argument");
+            if (!inputPath) throw new Error("Invalid argument");
 
             await count(path.resolve(appState.cwd, inputPath));
           });
@@ -122,9 +124,9 @@ export const startRepl = async () => {
             const algorithm = getArgByName(args, "--algorithm", "sha256");
             const isSave = getArgFlagByName(args, "--save");
 
-            if (!inputPath) throw Error("Invalid argument");
+            if (!inputPath) throw new Error("Invalid argument");
             if (!["sha256", "md5", "sha512"].includes(algorithm))
-              throw Error("Invalid argument");
+              throw new Error("Invalid argument");
 
             await hash(
               path.resolve(appState.cwd, inputPath),
@@ -142,14 +144,52 @@ export const startRepl = async () => {
             const hashPath = getArgByName(args, "--hash");
             const algorithm = getArgByName(args, "--algorithm", "sha256");
 
-            if (!inputPath || !hashPath) throw Error("Invalid argument");
+            if (!inputPath || !hashPath) throw new Error("Invalid argument");
             if (!["sha256", "md5", "sha512"].includes(algorithm))
-              throw Error("Invalid argument");
+              throw new Error("Invalid argument");
 
             await hashCompare(
               path.resolve(appState.cwd, inputPath),
               path.resolve(appState.cwd, hashPath),
               algorithm,
+            );
+          });
+
+          break;
+        }
+
+        case command === "encrypt" && args.length === 6: {
+          await handleSuccessAndErrors(async () => {
+            const inputPath = getArgByName(args, "--input");
+            const outputPath = getArgByName(args, "--output");
+            const password = getArgByName(args, "--password");
+
+            if (!inputPath || !outputPath || !password)
+              throw new Error("Invalid argument");
+
+            await encrypt(
+              path.resolve(appState.cwd, inputPath),
+              path.resolve(appState.cwd, outputPath),
+              password,
+            );
+          });
+
+          break;
+        }
+
+        case command === "decrypt" && args.length === 6: {
+          await handleSuccessAndErrors(async () => {
+            const inputPath = getArgByName(args, "--input");
+            const outputPath = getArgByName(args, "--output");
+            const password = getArgByName(args, "--password");
+
+            if (!inputPath || !outputPath || !password)
+              throw new Error("Invalid argument");
+
+            await decrypt(
+              path.resolve(appState.cwd, inputPath),
+              path.resolve(appState.cwd, outputPath),
+              password,
             );
           });
 
