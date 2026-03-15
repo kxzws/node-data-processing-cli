@@ -6,6 +6,7 @@ import { ls, up, cd } from "./navigation.js";
 
 import { csvToJson } from "./commands/csvToJson.js";
 import { jsonToCsv } from "./commands/jsonToCsv.js";
+import { count } from "./commands/count.js";
 
 import { getCommandAndArgs, getArgByName } from "./utils/argParser.js";
 import { appState } from "./utils/pathResolver.js";
@@ -92,6 +93,18 @@ export const startRepl = async () => {
               path.resolve(appState.cwd, inputPath),
               path.resolve(appState.cwd, outputPath),
             );
+          });
+
+          break;
+        }
+
+        case command === "count" && args.length === 2: {
+          await handleSuccessAndErrors(async () => {
+            const inputPath = getArgByName(args, "--input");
+
+            if (!inputPath) throw Error("Invalid argument");
+
+            await count(path.resolve(appState.cwd, inputPath));
           });
 
           break;

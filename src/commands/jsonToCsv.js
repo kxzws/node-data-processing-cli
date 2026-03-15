@@ -48,7 +48,7 @@ class JsonToCsvTransform extends Transform {
       this.headers &&
       !["[", "]"].includes(this.buffer.trim())
     ) {
-      const cleanLine = line.trim().replace(/[\t\r]+/gm, "");
+      const cleanLine = this.buffer.trim().replace(/[\t\r]+/gm, "");
 
       const recordData = JSON.parse(
         cleanLine[cleanLine.length - 1] === ","
