@@ -8,6 +8,7 @@ import { csvToJson } from "./commands/csvToJson.js";
 import { jsonToCsv } from "./commands/jsonToCsv.js";
 import { count } from "./commands/count.js";
 import { hash } from "./commands/hash.js";
+import { hashCompare } from "./commands/hashCompare.js";
 
 import {
   getCommandAndArgs,
@@ -129,6 +130,26 @@ export const startRepl = async () => {
               path.resolve(appState.cwd, inputPath),
               algorithm,
               isSave,
+            );
+          });
+
+          break;
+        }
+
+        case command === "hash-compare" && args.length > 1 && args.length < 7: {
+          await handleSuccessAndErrors(async () => {
+            const inputPath = getArgByName(args, "--input");
+            const hashPath = getArgByName(args, "--hash");
+            const algorithm = getArgByName(args, "--algorithm", "sha256");
+
+            if (!inputPath || !hashPath) throw Error("Invalid argument");
+            if (!["sha256", "md5", "sha512"].includes(algorithm))
+              throw Error("Invalid argument");
+
+            await hashCompare(
+              path.resolve(appState.cwd, inputPath),
+              path.resolve(appState.cwd, hashPath),
+              algorithm,
             );
           });
 
