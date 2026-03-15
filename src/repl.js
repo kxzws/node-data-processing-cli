@@ -7,8 +7,13 @@ import { ls, up, cd } from "./navigation.js";
 import { csvToJson } from "./commands/csvToJson.js";
 import { jsonToCsv } from "./commands/jsonToCsv.js";
 import { count } from "./commands/count.js";
+import { hash } from "./commands/hash.js";
 
-import { getCommandAndArgs, getArgByName } from "./utils/argParser.js";
+import {
+  getCommandAndArgs,
+  getArgByName,
+  getArgFlagByName,
+} from "./utils/argParser.js";
 import { appState } from "./utils/pathResolver.js";
 
 const handleSuccessAndErrors = async (callback) => {
@@ -105,6 +110,26 @@ export const startRepl = async () => {
             if (!inputPath) throw Error("Invalid argument");
 
             await count(path.resolve(appState.cwd, inputPath));
+          });
+
+          break;
+        }
+
+        case command === "hash" && args.length > 1 && args.length < 6: {
+          await handleSuccessAndErrors(async () => {
+            const inputPath = getArgByName(args, "--input");
+            const algorithm = getArgByName(args, "--algorithm", "sha256");
+            const isSave = getArgFlagByName(args, "--save");
+
+            if (!inputPath) throw Error("Invalid argument");
+            if (!["sha256", "md5", "sha512"].includes(algorithm))
+              throw Error("Invalid argument");
+
+            await hash(
+              path.resolve(appState.cwd, inputPath),
+              algorithm,
+              isSave,
+            );
           });
 
           break;

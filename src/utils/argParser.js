@@ -11,3 +11,7 @@ export const getArgByName = (args, argName, defaultValue) => {
     ? args[args.indexOf(argName) + 1]
     : defaultValue;
 };
+
+export const getArgFlagByName = (args, argName) => {
+  return args.indexOf(argName) !== -1;
+};
