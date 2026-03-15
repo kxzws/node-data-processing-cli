@@ -24,4 +24,14 @@ export const encrypt = async (inputPath, outputPath, password) => {
   const authTag = cipher.getAuthTag();
 
   writable.write(authTag);
+
+  // to await until auth tag will be written too
+  await new Promise((resolve, reject) => {
+    const authTagStream = createWriteStream(outputPath, { flags: "a" });
+    authTagStream.write(authTag);
+    authTagStream.end();
+
+    authTagStream.on("finish", resolve);
+    authTagStream.on("error", reject);
+  });
 };
